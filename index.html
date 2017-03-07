@@ -1,0 +1,164 @@
+<!--Following MDN Tutorial: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/A_first_splash -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Number guessing game</title>
+    <link src="style.css"></link>
+
+    <style>
+      html {
+        font-family: sans-serif;
+      }
+      body {
+        width: 50%;
+        max-width: 800px;
+        min-width: 480px;
+        margin: 0 auto;
+      }
+      .lastResult {
+        color: white;
+        padding: 3px;
+      }
+    </style>
+</head>
+
+<body>
+
+    <h1>Number guessing game</h1>
+
+    <p>We have selected a random number between 1 and 100. See if you can guess it in 10 turns or less. We'll tell you if your
+        guess was too high or too low.</p>
+
+    <div class="form">
+        <label for="guessField">Enter a guess: </label><input type="text" id="guessField" class="guessField">
+        <input type="submit" value="Submit guess" class="guessSubmit">
+    </div>
+
+    <div class="resultParas">
+        <p class="guesses"></p>
+        <p class="lastResult"></p>
+        <p class="lowOrHi"></p>
+    </div>
+
+</body>
+
+<script>
+    var randomNumber = Math.floor(Math.random() * 100) + 1;
+
+    var guesses = document.querySelector('.guesses');
+    var lastResult = document.querySelector('.lastResult');
+    var lowOrHi = document.querySelector('.lowOrHi');
+
+    var guessSubmit = document.querySelector('.guessSubmit');
+    var guessField = document.querySelector('.guessField');
+
+    var guessCount = 1;
+    var resetButton;
+    guessField.focus();
+
+    function checkGuess() {
+        //declares a variable called userGuess and sets its value to the current value entered 
+        //inside the text field. We also run this value through the built-in Number() method, 
+        //just to make sure the value is definitely a number.
+        var userGuess = Number(guessField.value);
+
+        //first conditional code block
+        if (guessCount === 1) {
+            guesses.textContent = 'Previous guesses: ';
+        }
+
+        //Appends the current userGuess value onto the end of the 
+        //guesses paragraph, plus a blank space so there will be a space between 
+        //each guess shown.
+        guesses.textContent += userGuess + ' ';
+
+        //checks whether the user's guess is equal to the 
+        //randomNumber set at the top of our JavaScript.
+        if (userGuess === randomNumber) {
+            lastResult.textContent = 'Congratulations! You got it right!';
+            lastResult.style.backgroundColor = 'green';
+            lowOrHi.textContent = '';
+            setGameOver();
+            //checks whether this turn is the user's last turn
+        } else if (guessCount === 10) {
+            lastResult.textContent = '!!!GAME OVER!!!';
+            setGameOver();
+            //if the player didn't guess right, but they have more guesses left
+        } else {
+            lastResult.textContent = 'Wrong!';
+            lastResult.style.backgroundColor = 'red';
+
+            //conditional test to check whether the guess was higher or lower than the answer
+            if (userGuess < randomNumber) {
+                lowOrHi.textContent = 'Last guess was too low!';
+            } else if (userGuess > randomNumber) {
+                lowOrHi.textContent = 'Last guess was too high!';
+            }
+        }
+        //get ready for next guess to be submitted
+        //add 1 to the guessCount variable so the player uses up their turn
+        guessCount++;
+
+        //empty the value out of the form text field and focus it again, 
+        //ready for the next guess to be entered
+        guessField.value = '';
+        guessField.focus();
+    }
+    //Adding an event listener to the guessSubmit button
+    //This is a method that takes two input values:the type of event we are listening out for 
+    //(in this case click) as a string, and the code we want to run when the event occurs 
+    //(in this case the checkGuess() function — 
+    //note that we don't need to specify the parentheses when writing it inside addEventListener()).
+    guessSubmit.addEventListener('click', checkGuess);
+
+    function setGameOver() {
+        //The first two lines disable the form text input and button by setting their disabled 
+        //properties to true. This is necessary, because if we didn't, the user could 
+        //submit more guesses after the game is over, which would mess things up.
+        guessField.disabled = true;
+        guessSubmit.disabled = true;
+
+        //generate a new <button> element, set its text label to "Start new game", 
+        //and add it to the bottom of our existing HTML.
+        resetButton = document.createElement('button');
+        resetButton.textContent = 'Start new game';
+        document.body.appendChild(resetButton);
+
+        //sets an event listener on our new button so that when it is clicked, 
+        //a function called resetGame() is run.
+        resetButton.addEventListener('click', resetGame);
+    }
+
+    function resetGame() {
+        //Puts the guessCount back down to 1.
+        guessCount = 1;
+
+        //Clears all the information paragraphs.
+        var resetParas = document.querySelectorAll('.resultParas p');
+        for (var i = 0; i < resetParas.length; i++) {
+            resetParas[i].textContent = '';
+        }
+
+        //Removes the reset button from our code.
+        resetButton.parentNode.removeChild(resetButton);
+
+        //Enables the form elements, and empties 
+        //and focuses the text field, ready for a new guess to be entered.
+        guessField.disabled = false;
+        guessSubmit.disabled = false;
+        guessField.value = '';
+        guessField.focus();
+
+        //Removes the background color from the lastResult paragraph.
+        lastResult.style.backgroundColor = 'white';
+        //Generates a new random number 
+        //so that you are not just guessing the same number again!
+        randomNumber = Math.floor(Math.random() * 100) + 1;
+    }
+</script>
+
+</html>
